@@ -47,5 +47,22 @@ namespace NOVENTIQ.Controllers
             return Ok(loginResponse);
 
         }
+        [HttpPost("assignrole")]
+        public async Task<IActionResult> AssignRole(RegisterRoleDto model)
+        {
+            var assignRoleSuccess = await _auth.AssignRole(model);
+            if (!assignRoleSuccess)
+            {
+                _responseDto.IsSuccess=false;
+                _responseDto.Message = "Something went wrong!!";
+                return BadRequest(_responseDto);
+            }
+            else
+            {
+                _responseDto.IsSuccess = true;
+                _responseDto.Message = "Role assigned successfully";
+                return Ok(_responseDto);
+            }
+        }
     }
 }

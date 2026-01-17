@@ -10,10 +10,12 @@ namespace NOVENTIQ.Services
     {
         private readonly AppDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
-        public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _db = dbContext;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<string> Register(RegisterationRequestDto registerationRequestDto)
@@ -75,6 +77,22 @@ namespace NOVENTIQ.Services
                 User = userDto,
             };
             return loginResponseDto;
+        }
+        public async Task<bool> AssignRole(RegisterRoleDto registerRole)
+        {
+            var user = _db.ApplicationUsers.FirstOrDefault(x => x.Email == registerRole.Email);
+            bool isValid = await _userManager.CheckPasswordAsync(user, registerRole.Password);
+            if (user != null && isValid)
+            {
+                //Checking if role existss if not then will create that role and assign
+                if (!_roleManager.RoleExistsAsync(registerRole.Role).GetAwaiter().GetResult())
+                {
+                    _roleManager.CreateAsync(new IdentityRole(registerRole.Role)).GetAwaiter().GetResult();
+                }
+                await _userManager.AddToRoleAsync(user, registerRole.Role);
+                return true;
+            }
+            return false;
         }
 
     }

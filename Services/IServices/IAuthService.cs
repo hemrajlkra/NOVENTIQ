@@ -6,5 +6,6 @@ namespace NOVENTIQ.Services.IServices
     {
         Task<string> Register(RegisterationRequestDto registerationRequestDto);
         Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto);
+        Task<bool> AssignRole(RegisterRoleDto registerRole);
     }
 }
