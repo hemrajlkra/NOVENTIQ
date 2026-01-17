@@ -53,5 +53,29 @@ namespace NOVENTIQ.Services
             }
             return "Error Encountered";
         }
+        public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
+        {
+            var user = _db.ApplicationUsers.FirstOrDefault(x => x.UserName == loginRequestDto.Username);
+            bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+            if(user == null || !isValid)
+            {
+                return new LoginResponseDto()
+                {
+                    User = null
+                };
+            }
+            UserDto userDto = new()
+            {
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Name = user.Name
+            };
+            LoginResponseDto loginResponseDto = new()
+            {
+                User = userDto,
+            };
+            return loginResponseDto;
+        }
+
     }
 }

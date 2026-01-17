@@ -33,5 +33,19 @@ namespace NOVENTIQ.Controllers
                 return Ok(_responseDto);
             }
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequestDto loginRequestDto)
+        {
+            var loginResponse = await _auth.Login(loginRequestDto);
+            if(loginResponse == null)
+            {
+                _responseDto.IsSuccess= false;
+                _responseDto.Message = "Invalid email or password";
+                return BadRequest(_responseDto);
+            }
+            _responseDto.Result = loginResponse;
+            return Ok(loginResponse);
+
+        }
     }
 }
