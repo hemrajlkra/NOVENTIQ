@@ -11,11 +11,14 @@ namespace NOVENTIQ.Services
         private readonly AppDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly IJwtTokenGenerator _jwtToken;
+        public AuthService(AppDbContext dbContext, UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
         {
             _db = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
+            _jwtToken = jwtTokenGenerator;
         }
 
         public async Task<string> Register(RegisterationRequestDto registerationRequestDto)
@@ -63,9 +66,12 @@ namespace NOVENTIQ.Services
             {
                 return new LoginResponseDto()
                 {
-                    User = null
+                    User = null,
+                    Token = ""
                 };
             }
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var token = _jwtToken.TokenGenerate(user, userRoles);
             UserDto userDto = new()
             {
                 Email = user.Email,
@@ -75,6 +81,7 @@ namespace NOVENTIQ.Services
             LoginResponseDto loginResponseDto = new()
             {
                 User = userDto,
+                Token = token,
             };
             return loginResponseDto;
         }
