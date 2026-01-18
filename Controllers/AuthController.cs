@@ -37,7 +37,7 @@ namespace NOVENTIQ.Controllers
         public async Task<IActionResult> Login(LoginRequestDto loginRequestDto)
         {
             var loginResponse = await _auth.Login(loginRequestDto);
-            if(loginResponse == null)
+            if(loginResponse.User == null)
             {
                 _responseDto.IsSuccess= false;
                 _responseDto.Message = "Invalid email or password";
@@ -63,6 +63,14 @@ namespace NOVENTIQ.Controllers
                 _responseDto.Message = "Role assigned successfully";
                 return Ok(_responseDto);
             }
+        }
+        [HttpPost("refreshtoken")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto refreshToken)
+        {
+            var rfToken = await _auth.RefreshToken(refreshToken);
+            if (rfToken == null)
+                return Unauthorized("Invalid or expired refresh token");
+            return Ok(rfToken);
         }
     }
 }

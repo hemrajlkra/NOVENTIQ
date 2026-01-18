@@ -1,0 +1,7 @@
+﻿namespace NOVENTIQ.Model.DTO
+{
+    public class RefreshTokenRequestDto
+    {
+        public string RefreshToken { get; set; }
+    }
+}

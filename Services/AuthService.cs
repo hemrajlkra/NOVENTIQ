@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using NOVENTIQ.Data;
 using NOVENTIQ.Model;
 using NOVENTIQ.Model.DTO;
@@ -67,11 +68,13 @@ namespace NOVENTIQ.Services
                 return new LoginResponseDto()
                 {
                     User = null,
-                    Token = ""
+                    Token = "",
+                    RefreshToken=""
                 };
             }
             var userRoles = await _userManager.GetRolesAsync(user);
             var token = _jwtToken.TokenGenerate(user, userRoles);
+            var refreshToken = await _jwtToken.TokenRefresh(user.Id);
             UserDto userDto = new()
             {
                 Email = user.Email,
@@ -82,6 +85,7 @@ namespace NOVENTIQ.Services
             {
                 User = userDto,
                 Token = token,
+                RefreshToken= refreshToken.Token
             };
             return loginResponseDto;
         }
@@ -101,6 +105,27 @@ namespace NOVENTIQ.Services
             }
             return false;
         }
+        public async Task<TokenResponseDto> RefreshToken(RefreshTokenRequestDto refreshTokenDto)
+        {
+            var refreshToken = _jwtToken.ValidateRefreshToken(refreshTokenDto.RefreshToken);
+            if (refreshToken.Result == null)
+                return null;
+            var user =await _userManager.FindByIdAsync(refreshToken.Result.UserId);
+            if (user == null)
+                return null;
 
+            var roles = await _userManager.GetRolesAsync(user);
+            var newAccessTokn = _jwtToken.TokenGenerate(user, roles);
+
+            //revoke old refresh token and generate new refresh token
+            await _jwtToken.RevokeRefreshTokenAsync(refreshTokenDto.RefreshToken);
+            var newRefreshToken = await _jwtToken.TokenRefresh(user.Id);
+            return new TokenResponseDto
+            {
+                AccessToken = newAccessTokn,
+                RefreshToken = newRefreshToken.Token,
+                TokenExpiration = DateTime.UtcNow.AddMinutes(15)
+            };
+        }
     }
 }
