@@ -20,6 +20,14 @@ namespace NOVENTIQ.Controllers
         public async Task<IActionResult> Register(RegisterationRequestDto registerationRequestDto)
         {
             var errorMsg = await _auth.Register(registerationRequestDto);
+            //Register with default role as Employee
+            RegisterRoleDto defaultRole = new RegisterRoleDto
+            {
+                Email = registerationRequestDto.Email,
+                Password = registerationRequestDto.Password,
+                Role = "Employee"
+            };
+            await _auth.AssignRole(defaultRole);
             if (!string.IsNullOrEmpty(errorMsg))
             {
                 _responseDto.IsSuccess = false;
