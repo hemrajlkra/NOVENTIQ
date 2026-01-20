@@ -46,5 +46,24 @@ namespace NOVENTIQ.Controllers
             }
             
         }
+        [HttpGet("getuser")]
+        public async Task<IActionResult> GetUser(string email)
+        {
+            var response = await _userService.GetUser(email);
+            if(response == null)
+            {
+                _responseDto.IsSuccess = false;
+                _responseDto.Message = "User doesn't exist";
+                return BadRequest(_responseDto);
+            }
+            else
+            {
+                _responseDto.IsSuccess = true;
+                _responseDto.Message = "Successfully Retrieved";
+                _responseDto.Result = response;
+                return Ok(_responseDto);
+            }
+
+        }
     }
 }

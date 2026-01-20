@@ -8,5 +8,6 @@ namespace NOVENTIQ.Services.IServices
     {
         public IEnumerable<UserDto> Getall();
         Task<string> CreateUser(User user);
+        Task<UserDto> GetUser(string email);
     }
 }

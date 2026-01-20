@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NOVENTIQ.Data;
 using NOVENTIQ.Model;
 using NOVENTIQ.Model.DTO;
@@ -57,6 +58,22 @@ namespace NOVENTIQ.Services.IServices
                 PhoneNumber = x.PhoneNumber
             }).ToList();
             return users;
+        }
+        public async Task<UserDto> GetUser(string email)
+        {
+            var user =  await _userManager.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if (user == null)
+            {
+                return null;
+            }
+            UserDto dto = new()
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+            return dto;
         }
 
     }
