@@ -1,0 +1,12 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using NOVENTIQ.Model;
+using NOVENTIQ.Model.DTO;
+
+namespace NOVENTIQ.Services.IServices
+{
+    public interface IUserService
+    {
+        public IEnumerable<UserDto> Getall();
+        Task<string> CreateUser(User user);
+    }
+}
