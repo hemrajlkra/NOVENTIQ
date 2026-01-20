@@ -75,6 +75,55 @@ namespace NOVENTIQ.Services.IServices
             };
             return dto;
         }
+        public async Task<string> UpdateUser(string id, UserUpdate user)
+        {
+            var appUser = await _userManager.FindByIdAsync(id);
+            if (appUser == null)
+            {
+                return "User not found";
+            }
+            //if email change check if not already exist
+            if(!string.Equals(appUser.Email, user.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                var emailExist = await _userManager.FindByEmailAsync(user.Email);
+                if(emailExist != null && emailExist.Id != id)
+                {
+                    return "Email already in use";
+                }
+            }
+            //check if userName is unique
+            if(!string.Equals(appUser.UserName, user.UserName, StringComparison.OrdinalIgnoreCase))
+            {
+                var userNameExist = await _userManager.FindByNameAsync(user.UserName);
+                if(userNameExist != null && userNameExist.Id != id)
+                {
+                    return $"{user.UserName} in use";
+                }
+            }
+            appUser.Name = user.Name;
+            appUser.Email = user.Email;
+            appUser.PhoneNumber = user.PhoneNumber;
+            appUser.UserName = user.UserName;
+            appUser.NormalizedEmail = user.Email.ToUpperInvariant();
+            appUser.NormalizedUserName = user.UserName.ToUpperInvariant();
+            try
+            {
+                var result = await _userManager.UpdateAsync(appUser);
+                if(result.Succeeded)
+                {
+                    return string.Empty;
+                }
+                else
+                {
+                    return result.Errors.FirstOrDefault().Description;
+                }
+            }
+            catch (Exception ex)
+            {
+                return $"Error updating user {ex.Message}";
+            }
+
+        }
 
     }
 }

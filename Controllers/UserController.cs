@@ -65,5 +65,23 @@ namespace NOVENTIQ.Controllers
             }
 
         }
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser(string id, UserUpdate user)
+        {
+            var result = await _userService.UpdateUser(id, user);
+            if (!string.IsNullOrEmpty(result))
+            {
+                _responseDto.IsSuccess = false;
+                _responseDto.Message = result;
+                return BadRequest(_responseDto);
+            }
+            else
+            {
+                _responseDto.IsSuccess = true;
+                _responseDto.Message = "Updated successfully";
+                return Ok(_responseDto);
+            }
+
+        }
     }
 }
