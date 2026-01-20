@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using NOVENTIQ.Data;
 using NOVENTIQ.Model;
 using NOVENTIQ.Model.DTO;
+using NOVENTIQ.Services.IServices;
 
-namespace NOVENTIQ.Services.IServices
+namespace NOVENTIQ.Services
 {
     public class UserService :IUserService
     {
