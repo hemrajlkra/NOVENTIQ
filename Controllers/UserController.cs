@@ -83,5 +83,24 @@ namespace NOVENTIQ.Controllers
             }
 
         }
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var result = await _userService.Delete(id);
+            if (!string.IsNullOrEmpty(result))
+            {
+                _responseDto.IsSuccess = false;
+                _responseDto.Message = result;
+                return BadRequest(_responseDto);
+            }
+            else
+            {
+                _responseDto.IsSuccess = true;
+                _responseDto.Message = "Deleted successfully";
+                return Ok(_responseDto);
+            }
+
+        }
     }
 }

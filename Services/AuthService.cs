@@ -32,10 +32,18 @@ namespace NOVENTIQ.Services
                 PhoneNumber = registerationRequestDto.PhoneNumber,
                 NormalizedEmail = registerationRequestDto.Email.ToUpper()
             };
+            ////Register with default role as Employee
+            RegisterRoleDto roleDto = new()
+            {
+                Email = registerationRequestDto.Email,
+                Password = registerationRequestDto.Password,
+                Role = "Employee"
+            };
             try
             {
                 var result = await _userManager.CreateAsync(appUser, registerationRequestDto.Password);
-                if (result.Succeeded)
+                var resultRole = await AssignRole(roleDto);
+                if (result.Succeeded && resultRole)
                 {
                     var usertoReturn = _db.ApplicationUsers.FirstOrDefault(x => x.Email == registerationRequestDto.Email);
                     UserDto userDto = new()
@@ -55,9 +63,8 @@ namespace NOVENTIQ.Services
             }
             catch (Exception ex) 
             {
-
+                return $"Error Encountered {ex}";
             }
-            return "Error Encountered";
         }
         public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
         {

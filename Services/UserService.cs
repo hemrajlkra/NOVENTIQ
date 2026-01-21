@@ -12,7 +12,7 @@ namespace NOVENTIQ.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _db;
-        public UserService(AppDbContext dbContext, UserManager<ApplicationUser> userManager) 
+        public UserService(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _db = dbContext;
             _userManager = userManager;
@@ -124,6 +124,36 @@ namespace NOVENTIQ.Services
                 return $"Error updating user {ex.Message}";
             }
 
+        }
+        public async Task<string> Delete(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return "User doesn't exists";
+            try
+            {
+                //delete role First
+                var roles = await _userManager.GetRolesAsync(user);
+                if(roles != null && roles.Count > 0)
+                {
+                    var removeUserRole = await _userManager.RemoveFromRolesAsync(user, roles);
+                    if(!removeUserRole.Succeeded)
+                    {
+                        return removeUserRole.Errors.FirstOrDefault()?.Description ?? "Failed to deletee role";
+                    }
+                }
+                // Then delete User
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                    return string.Empty;
+                else
+                    return result.Errors.FirstOrDefault()?.Description ?? "Failed to delete User";
+                
+            }
+            catch (Exception ex)
+            {
+                return $"Error deleting {ex.Message}";
+            }
         }
 
     }

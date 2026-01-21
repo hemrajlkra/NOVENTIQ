@@ -10,5 +10,6 @@ namespace NOVENTIQ.Services.IServices
         Task<string> CreateUser(User user);
         Task<UserDto> GetUser(string email);
         Task<string> UpdateUser(string id, UserUpdate user);
+        Task<string> Delete(string id);
     }
 }
