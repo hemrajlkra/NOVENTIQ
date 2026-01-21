@@ -21,7 +21,8 @@ namespace NOVENTIQ.Controllers
             _userService = userService;
             _responseDto = new ResponseDto();
         }
-        
+
+        [Authorize(Roles ="ADMIN")]
         [HttpGet("getall")]
         public IActionResult GetAll()
         {
@@ -46,6 +47,7 @@ namespace NOVENTIQ.Controllers
             }
             
         }
+        [Authorize(Roles ="EMPLOYEE,ADMIN")]
         [HttpGet("getuser")]
         public async Task<IActionResult> GetUser(string email)
         {
@@ -65,6 +67,7 @@ namespace NOVENTIQ.Controllers
             }
 
         }
+        [Authorize(Roles ="ADMIN")]
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUser(string id, UserUpdate user)
         {
@@ -83,6 +86,7 @@ namespace NOVENTIQ.Controllers
             }
 
         }
+        [Authorize(Roles ="ADMIN")]
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<IActionResult> DeleteUser(string id)

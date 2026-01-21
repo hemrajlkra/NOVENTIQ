@@ -34,8 +34,8 @@ namespace NOVENTIQ.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 
             };
-            claimsList.AddRange(role.Select(role => new Claim(ClaimTypes.Role, role)));
-
+            claimsList.AddRange(role.Select(role => new Claim(ClaimTypes.Role, role.ToUpperInvariant())));
+            
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Audience = _options.Audience,
